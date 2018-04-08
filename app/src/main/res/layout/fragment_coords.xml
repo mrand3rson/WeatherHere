@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
+    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+    android:layout_marginStart="@dimen/activity_horizontal_margin"
+    android:layout_marginTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:id="@+id/layout_progress_coords"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ProgressBar
+            android:id="@+id/progress_coords"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="@dimen/progress_size"
+            android:layout_height="@dimen/progress_size" />
+
+        <TextView
+            android:id="@+id/label_coords"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/string_getting_the_coords" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/text_coords"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/string_your_coords"
+        android:textSize="@dimen/accent_size" />
+
+    <LinearLayout
+        android:id="@+id/layout_progress_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ProgressBar
+            android:id="@+id/progress_address"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="@dimen/progress_size"
+            android:layout_height="@dimen/progress_size" />
+
+        <TextView
+            android:id="@+id/label_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/string_getting_the_location" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/text_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/string_your_location"
+        android:textSize="@dimen/accent_size" />
+
+    <Button
+        android:id="@+id/button_weather"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/string_get_the_weather" />
+
+</LinearLayout>

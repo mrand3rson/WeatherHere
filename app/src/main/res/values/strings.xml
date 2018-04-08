@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Weather Here</string>
+
+    <string name="action_stats">Statistics</string>
+
+    <string name="string_getting_the_coords">Getting the coords…</string>
+    <string name="string_your_coords">Your coords: </string>
+    <string name="string_getting_the_location">Getting the location…</string>
+    <string name="string_your_location">Your location: </string>
+    <string name="string_get_the_weather">Get the weather</string>
+    <string name="address_found">Address found</string>
+
+    <string name="pattern_city">%s</string>
+    <string name="pattern_temp_av">Temperature: %.1f °C (%.1f °F)</string>
+    <string name="pattern_pressure">Pressure: %.1f mmHg (%.1f Pa)</string>
+    <string name="pattern_humidity">Humidity: %.1f %%</string>
+    <string name="pattern_wind_speed">Wind speed: %.1f m/s</string>
+</resources>
