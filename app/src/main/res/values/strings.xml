@@ -15,4 +15,5 @@
     <string name="pattern_pressure">Pressure: %.1f mmHg (%.1f Pa)</string>
     <string name="pattern_humidity">Humidity: %.1f %%</string>
     <string name="pattern_wind_speed">Wind speed: %.1f m/s</string>
+    <string name="text_coordinates">Coordinates:</string>
 </resources>

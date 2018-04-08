@@ -6,4 +6,5 @@
 
     <dimen name="progress_size">16dp</dimen>
     <dimen name="accent_size">18sp</dimen>
+    <dimen name="recycler_row_title_margin_bottom">12dp</dimen>
 </resources>
