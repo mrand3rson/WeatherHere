@@ -12,12 +12,14 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.weatherhere.R;
 import com.example.weatherhere.ui.fragments.CoordsFragment;
+import com.example.weatherhere.ui.fragments.WeatherFragment;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -33,6 +35,8 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private final static int CODE_GET_PERMISSION = 1;
+    public final static String TAG_COORDS_FRAGMENT = "coords";
+    public final static String TAG_WEATHER_FRAGMENT = "weather";
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -53,38 +57,64 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         ButterKnife.bind(this);
 
         setSupportActionBar(mToolbar);
-        mCoordsFragment = new CoordsFragment();
-        setCurrentFragment(mCoordsFragment);
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        mLocationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    return;
+        if (savedInstanceState == null) {
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            mLocationCallback = new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    if (locationResult == null) {
+                        return;
+                    }
+
+                    mCoordsFragment.setLocation(locationResult.getLastLocation());
+                    mCoordsFragment.showCoords();
+                    mFusedLocationClient.removeLocationUpdates(mLocationCallback);
                 }
+            };
+        } else {
+            WeatherFragment weatherFragment = (WeatherFragment)
+                    getSupportFragmentManager().findFragmentByTag(TAG_WEATHER_FRAGMENT);
+            if (weatherFragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, weatherFragment)
+                        .commit();
+            } else {
 
-                mCoordsFragment.setCoords(locationResult.getLastLocation());
-                mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+                mCoordsFragment = (CoordsFragment)
+                        getSupportFragmentManager().findFragmentByTag(TAG_COORDS_FRAGMENT);
+                if (mCoordsFragment != null) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, mCoordsFragment)
+                            .commit();
+                }
             }
-        };
+
+            return;
+        }
+
+        mCoordsFragment = new CoordsFragment();
+        addAndReplaceCoordsFragment(mCoordsFragment);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (mGoogleApiClient != null && mFusedLocationClient != null) {
-            startLocationUpdates();
-        } else {
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                            CODE_GET_PERMISSION);
-                }
+        if (mCoordsFragment != null && mCoordsFragment.getLocation() == null) {
+            if (mGoogleApiClient != null && mFusedLocationClient != null) {
+                startLocationUpdates();
             } else {
-                buildGoogleApiClient();
+
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                                CODE_GET_PERMISSION);
+                    }
+                } else {
+                    buildGoogleApiClient();
+                }
             }
         }
     }
@@ -143,8 +173,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
-    public void setCurrentFragment(Fragment fragment) {
+    public void addAndReplaceCoordsFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction()
+                .add(fragment, TAG_COORDS_FRAGMENT)
+                .replace(R.id.container, fragment)
+                .commit();
+    }
+
+    public void addAndReplaceWeatherFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .addToBackStack(TAG_COORDS_FRAGMENT)
+                .add(fragment, TAG_WEATHER_FRAGMENT)
                 .replace(R.id.container, fragment)
                 .commit();
     }
@@ -162,6 +201,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if (id == R.id.action_stats) {
             Intent intent = new Intent(this, StatsActivity.class);
             startActivity(intent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                overridePendingTransition(R.anim.enter_right_in, R.anim.exit_left_out);
+            }
             return true;
         }
 
@@ -170,7 +212,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     protected void onPause() {
-        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+        if (mFusedLocationClient != null)
+            mFusedLocationClient.removeLocationUpdates(mLocationCallback);
         super.onPause();
     }
 }

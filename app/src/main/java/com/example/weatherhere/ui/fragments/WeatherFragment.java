@@ -1,7 +1,6 @@
 package com.example.weatherhere.ui.fragments;
 
 
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -103,6 +102,8 @@ public class WeatherFragment extends MvpAppCompatFragment implements WeatherView
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+
         if (getArguments() != null) {
             mCityName = getArguments().getString(CITY_NAME);
             mLocation = getArguments().getParcelable(LOCATION);
@@ -114,13 +115,16 @@ public class WeatherFragment extends MvpAppCompatFragment implements WeatherView
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_weather, container, false);
         ButterKnife.bind(this, v);
-        mWeatherInfo.setVisibility(View.GONE);
         return v;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (mPresenter.gotWeather) {
+            return;
+        }
+        mWeatherInfo.setVisibility(View.GONE);
         mPresenter.setCityName(mCityName);
         mPresenter.setLocation(mLocation);
         mPresenter.getWeather();
@@ -131,6 +135,9 @@ public class WeatherFragment extends MvpAppCompatFragment implements WeatherView
             mTextCityInfoView.setText(String.format(Locale.getDefault(),
                     PATTERN_CITY,
                     mCityName));
+
+            final int imageViewSize = mPresenter.getImageDimension();
+
             for (Weather weather : response.weatherList) {
                 LinearLayout.LayoutParams params =
                         new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -142,7 +149,7 @@ public class WeatherFragment extends MvpAppCompatFragment implements WeatherView
 
                 ImageView imageWeatherIconView = new ImageView(getActivity());
                 LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        imageViewSize, imageViewSize);
                 imageParams.gravity = Gravity.CENTER;
                 imageWeatherIconView.setLayoutParams(imageParams);
 

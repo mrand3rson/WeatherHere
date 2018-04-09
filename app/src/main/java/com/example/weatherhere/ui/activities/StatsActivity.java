@@ -1,5 +1,6 @@
 package com.example.weatherhere.ui.activities;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +22,16 @@ public class StatsActivity extends AppCompatActivity {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
+    private StatsFragment mStatsFragment;
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            overridePendingTransition(R.anim.enter_left_in, R.anim.exit_right_out);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +43,8 @@ public class StatsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        setFragment(new StatsFragment());
+        mStatsFragment = new StatsFragment();
+        setFragment(mStatsFragment);
     }
 
     private void setFragment(Fragment fragment) {
@@ -44,7 +56,7 @@ public class StatsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            finish();
+            onBackPressed();
         }
 
         return super.onOptionsItemSelected(item);

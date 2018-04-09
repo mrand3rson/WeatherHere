@@ -19,8 +19,6 @@ import com.example.weatherhere.sources.Constants;
 import com.example.weatherhere.ui.activities.MainActivity;
 import com.example.weatherhere.ui.services.AddressIntentService;
 
-import java.util.Locale;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -42,8 +40,18 @@ public class CoordsFragment extends Fragment {
     @BindView(R.id.button_weather)
     Button mWeatherButton;
 
-    private AddressResultReceiver mResultReceiver;
+    public Location getLocation() {
+        return mLocation;
+    }
+
+    public void setLocation(Location mLocation) {
+        this.mLocation = mLocation;
+    }
+
     private Location mLocation;
+    private String mAddressOutput;
+
+    private AddressResultReceiver mResultReceiver;
 
 
     public CoordsFragment() {
@@ -53,8 +61,11 @@ public class CoordsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
 
-        mResultReceiver = new AddressResultReceiver(new Handler());
+        if (mLocation == null) {
+            mResultReceiver = new AddressResultReceiver(new Handler());
+        }
     }
 
     @Override
@@ -64,20 +75,28 @@ public class CoordsFragment extends Fragment {
 
         ButterKnife.bind(this, v);
 
-        waitForCoords();
+        if (mLocation == null)
+            waitForCoords();
+        else {
+            showCoords();
 
+            if (mAddressOutput != null) {
+                onFinishGetAddress(mAddressOutput);
+            }
+        }
         return v;
     }
 
-    public void setCoords(Location location) {
+    public void showCoords() {
         toggleCoordsProgressVisibility(false);
-        mLocation = location;
-        mTextCoords.append(String.format(Locale.getDefault(),
-                "%f : %f",
-                location.getLatitude(), location.getLongitude()));
+        mTextCoords.setText(getString(R.string.pattern_your_coords,
+                mLocation.getLatitude(), mLocation.getLongitude())
+        );
 
         //reverse geocoding here
-        startIntentService(location);
+        if (mAddressOutput == null) {
+            startIntentService(mLocation);
+        }
     }
 
     protected void startIntentService(Location location) {
@@ -121,10 +140,10 @@ public class CoordsFragment extends Fragment {
     }
 
     public void onFinishGetAddress(final String address) {
-        mTextAddress.append(address);
         toggleAddressProgressVisibility(false);
+        mTextAddress.setText(getString(R.string.pattern_your_location, address));
         mWeatherButton.setOnClickListener(view -> {
-            ((MainActivity)getActivity()).setCurrentFragment(
+            ((MainActivity)getActivity()).addAndReplaceWeatherFragment(
                     WeatherFragment.newInstance(address, mLocation)
             );
         });
@@ -144,7 +163,7 @@ public class CoordsFragment extends Fragment {
                 return;
             }
 
-            String mAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
+            mAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
             if (mAddressOutput == null) {
                 mAddressOutput = "";
             }

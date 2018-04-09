@@ -3,7 +3,6 @@ package com.example.weatherhere.mvp.presenters;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.widget.ImageView;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
@@ -18,7 +17,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Calendar;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -29,6 +27,13 @@ import io.realm.Realm;
  */
 @InjectViewState
 public class WeatherPresenter extends MvpPresenter<WeatherView> {
+
+    public int getImageDimension() {
+        return IMAGE_DIMENSION;
+    }
+
+    private final int IMAGE_DIMENSION = 250;
+
     public void setCityName(String cityName) {
         this.mCityName = cityName;
     }
@@ -39,11 +44,14 @@ public class WeatherPresenter extends MvpPresenter<WeatherView> {
 
     private String mCityName;
     private Location mLocation;
+    public boolean gotWeather;
 
 
     public void getWeather() {
         WeatherApi api = MyApp.getRetrofit().create(WeatherApi.class);
-        api.getWeather(mCityName, WeatherApi.API_KEY)
+        //replaced => api.getWeather(mCityName, WeatherApi.API_KEY)
+        //because of difference between <weather api city name> and <reverse geocoding api city name>
+        api.getWeather(mLocation.getLatitude(), mLocation.getLongitude(), WeatherApi.API_KEY)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
@@ -53,6 +61,7 @@ public class WeatherPresenter extends MvpPresenter<WeatherView> {
                                 mLocation.getLatitude(),
                                 mLocation.getLongitude(),
                                 mCityName));
+                        gotWeather = true;
                         getViewState().retrieveWeather(response);
                     }
                 });
@@ -71,7 +80,7 @@ public class WeatherPresenter extends MvpPresenter<WeatherView> {
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(bitmap -> {
                     Bitmap scaledBitmap =
-                            Bitmap.createScaledBitmap(bitmap, 250, 250, false);
+                            Bitmap.createScaledBitmap(bitmap, IMAGE_DIMENSION, IMAGE_DIMENSION, false);
                     setter.set(scaledBitmap);
                 });
     }

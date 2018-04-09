@@ -32,7 +32,7 @@
         android:id="@+id/text_coords"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/string_your_coords"
+        android:text=""
         android:textSize="@dimen/accent_size" />
 
     <LinearLayout
@@ -58,7 +58,7 @@
         android:id="@+id/text_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/string_your_location"
+        android:text=""
         android:textSize="@dimen/accent_size" />
 
     <Button

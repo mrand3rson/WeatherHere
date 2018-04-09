@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,9 +26,13 @@ import butterknife.ButterKnife;
 public class StatsAdapter extends RecyclerView.Adapter<StatsAdapter.ViewHolder>{
 
     private final static String PATTERN_COORDS = "%f : %f";
-    private final static String PATTERN_DATE = "dd.MM.yyyy hh:mm";
+    private final static String PATTERN_DATE = "dd.MM.yyyy HH:mm";
     private final Context mContext;
     private final int mResource;
+
+    public List<QueryInfo> getData() {
+        return mData;
+    }
     private final List<QueryInfo> mData;
 
 
@@ -51,14 +56,25 @@ public class StatsAdapter extends RecyclerView.Adapter<StatsAdapter.ViewHolder>{
         holder.coords.setText(String.format(Locale.getDefault(),
                 PATTERN_COORDS,
                 mData.get(position).lat, mData.get(position).lng));
-        SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_DATE, Locale.getDefault());
-        String dateByPattern = sdf.format(new Date(mData.get(position).dateTime));
-        holder.date.setText(dateByPattern);
+        String zonedDateByPattern = convertDateLongToString(mData.get(position).dateTime, PATTERN_DATE);
+        holder.date.setText(zonedDateByPattern);
     }
 
     @Override
     public int getItemCount() {
         return mData.size();
+    }
+
+    private String convertDateLongToString(long date, String format){
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
+            //hardcoded timezone :(
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT+03:00"));
+            return sdf.format(new Date(date));
+        }catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
