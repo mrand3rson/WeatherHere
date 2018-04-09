@@ -1,6 +1,8 @@
 package com.example.weatherhere.ui.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +11,7 @@ import android.widget.TextView;
 
 import com.example.weatherhere.R;
 import com.example.weatherhere.mvp.models.QueryInfo;
+import com.example.weatherhere.ui.activities.ResponseActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,8 +19,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.example.weatherhere.sources.Constants.QUERY_INFO;
 
 /**
  * Created by Andrei on 07.04.2018.
@@ -88,10 +94,20 @@ public class StatsAdapter extends RecyclerView.Adapter<StatsAdapter.ViewHolder>{
         @BindView(R.id.date)
         TextView date;
 
+        @BindView(R.id.card)
+        CardView card;
+
 
         ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            card.setOnClickListener(view -> {
+                Intent intent = new Intent(mContext, ResponseActivity.class);
+                QueryInfo info = mData.get(getAdapterPosition());
+                intent.putExtra(QUERY_INFO, info);
+                mContext.startActivity(intent);
+            });
         }
     }
 }

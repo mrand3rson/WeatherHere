@@ -10,4 +10,5 @@ public class Constants {
     public final static String RECEIVER = "RECEIVER";
     public final static String LOCATION_LAT = "LOCATION_LAT";
     public final static String LOCATION_LON = "LOCATION_LON";
+    public static final String QUERY_INFO = "query_info";
 }

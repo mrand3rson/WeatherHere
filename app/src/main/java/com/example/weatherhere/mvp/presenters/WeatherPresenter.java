@@ -8,8 +8,9 @@ import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.example.weatherhere.MyApp;
 import com.example.weatherhere.mvp.models.QueryInfo;
+import com.example.weatherhere.mvp.models.WeatherApiResponse;
 import com.example.weatherhere.mvp.views.WeatherView;
-import com.example.weatherhere.sources.ImageViewSetter;
+import com.example.weatherhere.sources.ImageViewSetterCallback;
 import com.example.weatherhere.sources.WeatherApi;
 
 import java.io.InputStream;
@@ -57,17 +58,22 @@ public class WeatherPresenter extends MvpPresenter<WeatherView> {
                 .subscribe(response -> {
                     if (response != null) {
                         long currentTime = Calendar.getInstance().getTime().getTime();
-                        saveRequest(new QueryInfo(currentTime,
+                        response.dt = currentTime; //api gives rather unclear value, so replacing it
+                        QueryInfo queryInfo = new QueryInfo(currentTime,
                                 mLocation.getLatitude(),
                                 mLocation.getLongitude(),
-                                mCityName));
+                                mCityName);
+
+                        saveRequest(queryInfo,
+                                response);
+
                         gotWeather = true;
                         getViewState().retrieveWeather(response);
                     }
                 });
     }
 
-    public void setBitmapFromURL(String src, ImageViewSetter setter) {
+    public void setBitmapFromURL(String src, ImageViewSetterCallback setter) {
         Single.fromCallable(() -> {
             URL url = new URL(src);
             HttpURLConnection connection =
@@ -85,10 +91,25 @@ public class WeatherPresenter extends MvpPresenter<WeatherView> {
                 });
     }
 
-    private void saveRequest(QueryInfo item) {
+    public void getWeatherFromHistory(QueryInfo queryInfo) {
+        WeatherApiResponse response = loadRequest(queryInfo.dateTime);
+        getViewState().retrieveWeather(response);
+    }
+
+    private WeatherApiResponse loadRequest(long dt) {
+        WeatherApiResponse response;
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        response = realm.where(WeatherApiResponse.class).equalTo("dt", dt).findFirst();
+        realm.commitTransaction();
+        return response;
+    }
+
+    private void saveRequest(QueryInfo item, WeatherApiResponse response) {
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
         realm.copyToRealm(item);
+        realm.copyToRealm(response);
         realm.commitTransaction();
     }
 }

@@ -1,23 +1,22 @@
 package com.example.weatherhere.mvp.models;
 
-import com.google.gson.annotations.SerializedName;
-
-import java.util.List;
+import io.realm.RealmList;
+import io.realm.RealmObject;
 
 /**
  * Created by Andrei on 08.04.2018.
  */
 
-public class WeatherApiResponse {
+public class WeatherApiResponse extends RealmObject{
 
-    @SerializedName("weather")
-    public List<Weather> weatherList;
+
+    public RealmList<Weather> weather;
     public Wind wind;
     public WeatherMetrics main;
+    public long dt;
 
-    public long getTime() {
-        return dt;
+
+    public WeatherApiResponse() {
+
     }
-
-    private long dt;
 }

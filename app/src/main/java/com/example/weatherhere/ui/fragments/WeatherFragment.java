@@ -131,14 +131,14 @@ public class WeatherFragment extends MvpAppCompatFragment implements WeatherView
     }
 
     public void retrieveWeather(WeatherApiResponse response) {
-        if (response.weatherList != null) {
+        if (response.weather != null) {
             mTextCityInfoView.setText(String.format(Locale.getDefault(),
                     PATTERN_CITY,
                     mCityName));
 
             final int imageViewSize = mPresenter.getImageDimension();
 
-            for (Weather weather : response.weatherList) {
+            for (Weather weather : response.weather) {
                 LinearLayout.LayoutParams params =
                         new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                 ViewGroup.LayoutParams.WRAP_CONTENT);

@@ -4,11 +4,13 @@ import com.example.weatherhere.mvp.models.metrics.Pressure;
 import com.example.weatherhere.mvp.models.metrics.Temperature;
 import com.google.gson.annotations.SerializedName;
 
+import io.realm.RealmObject;
+
 /**
  * Created by Andrei on 08.04.2018.
  */
 
-public class WeatherMetrics {
+public class WeatherMetrics extends RealmObject{
 
     public Temperature getTemperature() {
         return new Temperature(temperature);

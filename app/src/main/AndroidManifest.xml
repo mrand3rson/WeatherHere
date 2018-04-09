@@ -27,6 +27,7 @@
         <activity
             android:name=".ui.activities.StatsActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ui.activities.ResponseActivity" />
 
         <service
             android:name=".ui.services.AddressIntentService"
