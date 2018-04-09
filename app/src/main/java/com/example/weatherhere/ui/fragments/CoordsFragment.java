@@ -2,6 +2,7 @@ package com.example.weatherhere.ui.fragments;
 
 
 import android.content.Intent;
+import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -49,7 +50,8 @@ public class CoordsFragment extends Fragment {
     }
 
     private Location mLocation;
-    private String mAddressOutput;
+    private Address mAddressOutput;
+    private String mCity;
 
     private AddressResultReceiver mResultReceiver;
 
@@ -139,12 +141,13 @@ public class CoordsFragment extends Fragment {
         }
     }
 
-    public void onFinishGetAddress(final String address) {
+    public void onFinishGetAddress(final Address address) {
         toggleAddressProgressVisibility(false);
-        mTextAddress.setText(getString(R.string.pattern_your_location, address));
+        mCity = address.getLocality();
+        mTextAddress.setText(getString(R.string.pattern_your_location, address.getAddressLine(0)));
         mWeatherButton.setOnClickListener(view -> {
             ((MainActivity)getActivity()).addAndReplaceWeatherFragment(
-                    WeatherFragment.newInstance(address, mLocation)
+                    WeatherFragment.newInstance(mCity, mLocation)
             );
         });
         mWeatherButton.setVisibility(View.VISIBLE);
@@ -163,9 +166,9 @@ public class CoordsFragment extends Fragment {
                 return;
             }
 
-            mAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
+            mAddressOutput = resultData.getParcelable(Constants.RESULT_DATA_KEY);
             if (mAddressOutput == null) {
-                mAddressOutput = "";
+                mCity = "";
             }
 
             onFinishGetAddress(mAddressOutput);

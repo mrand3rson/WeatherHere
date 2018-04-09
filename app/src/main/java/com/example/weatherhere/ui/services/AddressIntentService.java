@@ -39,7 +39,7 @@ public class AddressIntentService extends IntentService {
                 //addressList = geocoder.getFromLocation(53.92506, 27.5941, 1);
 
                 //returns the city name
-                deliverResultToReceiver(Constants.SUCCESS_RESULT, addressList.get(0).getLocality());
+                deliverResultToReceiver(Constants.SUCCESS_RESULT, addressList.get(0));
 
 
             } catch (IOException e) {
@@ -48,9 +48,9 @@ public class AddressIntentService extends IntentService {
         }
     }
 
-    private void deliverResultToReceiver(int resultCode, String message) {
+    private void deliverResultToReceiver(int resultCode, Address message) {
         Bundle bundle = new Bundle();
-        bundle.putString(Constants.RESULT_DATA_KEY, message);
+        bundle.putParcelable(Constants.RESULT_DATA_KEY, message);
         mReceiver.send(resultCode, bundle);
     }
 }
